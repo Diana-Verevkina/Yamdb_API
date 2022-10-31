@@ -14,7 +14,7 @@ class Category(models.Model):
         return self.name
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField(verbose_name='Название жанра',
                             max_length=100)
     slug = models.SlugField(verbose_name='Слаг жанра', unique=True, )
@@ -33,7 +33,7 @@ class Titles(models.Model):
     year = models.IntegerField(verbose_name='Год произведения')
     description = models.TextField(verbose_name='Описание', blank=True,
                                    null=True)
-    genre = models.ForeignKey(Genres, verbose_name='Жанр',
+    genre = models.ForeignKey(Genre, verbose_name='Жанр',
                               on_delete=models.SET_NULL, blank=True,
                               null=True, related_name='genre',
                               help_text='Жанр произведения')
