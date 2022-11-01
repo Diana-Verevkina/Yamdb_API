@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
-    'django_filters'
+    'django_filters',
+    'djoser'
 ]
 
 MIDDLEWARE = [

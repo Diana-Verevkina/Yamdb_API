@@ -61,3 +61,6 @@ class Command(BaseCommand):
             titles.save()
 
         print('Данные в модель Titles загружены')
+
+
+

@@ -57,6 +57,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
@@ -70,3 +71,4 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
