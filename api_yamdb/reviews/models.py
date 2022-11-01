@@ -33,10 +33,11 @@ class Titles(models.Model):
     year = models.IntegerField(verbose_name='Год произведения')
     description = models.TextField(verbose_name='Описание', blank=True,
                                    null=True)
-    genre = models.ForeignKey(Genre, verbose_name='Жанр',
-                              on_delete=models.SET_NULL, blank=True,
-                              null=True, related_name='genre',
-                              help_text='Жанр произведения')
+    genre = models.ManyToManyField(Genre, through='TitlesGenre',
+                                   verbose_name='Жанр',
+                                   blank=True,
+                                   related_name='genre',
+                                   help_text='Жанр произведения')
     category = models.ForeignKey(Category, verbose_name='Категория',
                                  on_delete=models.SET_NULL, blank=True,
                                  null=True, related_name='category',
@@ -48,3 +49,11 @@ class Titles(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TitlesGenre(models.Model):
+    titles = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f'{self.titles} {self.genre}'
