@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
@@ -7,6 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
+# Create your views here.
 from reviews.models import User
 from .permissions import (IsAdmin)
 from .serializers import (RegisterDataSerializer, TokenSerializer,
