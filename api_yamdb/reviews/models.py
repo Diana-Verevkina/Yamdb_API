@@ -116,3 +116,44 @@ class TitlesGenre(models.Model):
 
     def __str__(self):
         return f'{self.titles} {self.genre}'
+
+
+class Review(models.Model):
+    VALUE = (
+    ('1', '1'),
+    ('2', '2'),
+    ('3', '3'),
+    ('4', '4'),
+    ('5', '5'),
+    ('6', '6'),
+    ('7', '7'),
+    ('8', '8'),
+    ('9', '9'),
+    ('10', '10')
+    )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    title = models.ForeignKey(
+        Titles, on_delete=models.CASCADE,
+        related_name='reviews', blank=True, null=True)
+    text = models.TextField()
+    score = models.CharField(max_length=2, choices=VALUE, default=1)
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.text
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE,
+        related_name='comments', blank=True, null=True)
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.text

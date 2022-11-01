@@ -1,12 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from reviews.models import Category, Genre, Titles
+from reviews.models import Category, Comment, Genre, Titles, Review
 
-from .serializers import CategorySerializer, GenreSerializer, TitlesSerializer, \
-    TitleCUDSerializer
+from .serializers import CategorySerializer, CommentSerializer, GenreSerializer, TitlesSerializer, \
+    TitleCUDSerializer, ReviewSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -51,3 +52,21 @@ class TitlesViewSet(viewsets.ModelViewSet):
         if self.request.method in ['POST', 'PATCH']:
             return TitleCUDSerializer
         return TitlesSerializer
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    # queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        return title.reviews
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
