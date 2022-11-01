@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, mixins
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import CategorySerializer, GenreSerializer, TitlesSerializer
+from .serializers import CategorySerializer, GenreSerializer, TitlesSerializer, ReviewSerializer, CommentSerializer
 from reviews.models import Category, Genre, Titles, Review, Comment
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -27,8 +27,19 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
+    # queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        return title.reviews
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        serializer.save(author=self.request.user, title=title)
+
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
