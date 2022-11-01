@@ -4,7 +4,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
-from ..reviews.models import Category, Genre, Titles
+# from api_yamdb.reviews.models import Category, Genre, Titles
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
