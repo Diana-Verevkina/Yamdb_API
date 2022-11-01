@@ -3,8 +3,8 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(verbose_name='Название категории',
-                            max_length=100)
-    slug = models.SlugField(verbose_name='Слаг категории', unique=True)
+                            max_length=256)
+    slug = models.SlugField(verbose_name='Слаг категории', unique=True, max_length=50)
 
     class Meta:
         verbose_name = 'Категория'
@@ -16,8 +16,8 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(verbose_name='Название жанра',
-                            max_length=100)
-    slug = models.SlugField(verbose_name='Слаг жанра', unique=True, )
+                            max_length=256)
+    slug = models.SlugField(verbose_name='Слаг жанра', unique=True, max_length=50)
 
     class Meta:
         verbose_name = 'Жанр'
