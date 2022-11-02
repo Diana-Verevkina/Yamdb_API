@@ -1,14 +1,22 @@
-<<<<<<< HEAD
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import get_object_or_404
-from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action
+from rest_framework import viewsets, filters, status, permissions
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated, \
+    IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from reviews.models import Category, Comment, Genre, Titles, Review
+from rest_framework_simplejwt.tokens import AccessToken
+from reviews.models import Category, Comment, Genre, Titles, User
 
-from .serializers import CategorySerializer, CommentSerializer, GenreSerializer, TitlesSerializer, \
-    TitleCUDSerializer, ReviewSerializer
+from .permission import (IsAdmin, IsAdminOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, TitlesSerializer,
+                          TitleCUDSerializer, ReviewSerializer,
+                          RegisterDataSerializer, TokenSerializer,
+                          UserEditSerializer, UserSerializer)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -17,6 +25,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = PageNumberPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
             lookup_field='slug', url_name='category_slug')
@@ -33,6 +42,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = PageNumberPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
             lookup_field='slug', url_name='genre_slug')
@@ -46,8 +56,9 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+    filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
@@ -73,21 +84,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
-=======
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
-
-# Create your views here.
-from reviews.models import User
-from .permissions import (IsAdmin)
-from .serializers import (RegisterDataSerializer, TokenSerializer,
-                          UserEditSerializer, UserSerializer)
 
 
 @api_view(["POST"])
@@ -162,4 +158,3 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
->>>>>>> origin/user_management
