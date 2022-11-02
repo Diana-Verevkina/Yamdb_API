@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Title, Review, User
 from django.core.exceptions import PermissionDenied
+from .filters import TitlesFilter
 
 
 from api.permissions import IsAdmin, IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly
@@ -58,9 +59,10 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
+    # filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
+    filterset_class = TitlesFilter
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
