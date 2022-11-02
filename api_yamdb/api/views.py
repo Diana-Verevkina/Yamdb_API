@@ -19,7 +19,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
 from reviews.models import Category, Genre, Title, Review, User
 
 
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -91,7 +90,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        raise PermissionDenied('Удаление чужих отзывов запрещено!')    
+        raise PermissionDenied('Удаление чужих отзывов запрещено!')
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -107,7 +106,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
         serializer.save(author=self.request.user, review=review)
-    
+
     def perform_update(self, serializer):
         if serializer.instance.author != self.request.user:
             raise PermissionDenied('Изменение чужих комментариев запрещено!')
@@ -118,7 +117,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        raise PermissionDenied('Удаление чужих комментариев запрещено!')    
+        raise PermissionDenied('Удаление чужих комментариев запрещено!')
 
 
 @api_view(["POST"])
