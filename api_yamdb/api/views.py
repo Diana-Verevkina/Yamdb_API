@@ -13,6 +13,7 @@ from reviews.models import Category, Comment, Genre, Titles, User
 
 
 from .permissions import (IsAdmin, IsAdminOrReadOnly)
+from .filters import TitlesFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
@@ -57,9 +58,10 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
+    # filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
+    filterset_class = TitlesFilter
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
