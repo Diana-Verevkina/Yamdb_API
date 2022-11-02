@@ -1,4 +1,5 @@
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,20 +9,15 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-
 from .filters import TitlesFilter
-from .permissions import (IsAdmin, IsAdminOrReadOnly,
-                          IsAdminModeratorOwnerOrReadOnly)
-from reviews.models import Category, Comment, Genre, Title, Review, User
-from django.core.exceptions import PermissionDenied
-from .filters import TitlesFilter
-
-
+from .permissions import (IsAdmin, IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
                           RegisterDataSerializer, TokenSerializer,
                           UserEditSerializer, UserSerializer)
+from reviews.models import Category, Genre, Title, Review, User
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
