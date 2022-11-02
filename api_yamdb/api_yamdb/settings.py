@@ -18,11 +18,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djoser'
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
     'rest_framework',
-    'django_filters',
-    'djoser'
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -111,7 +111,6 @@ REST_FRAMEWORK = {
         'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5
 }
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
