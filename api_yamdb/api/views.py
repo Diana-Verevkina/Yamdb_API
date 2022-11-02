@@ -5,20 +5,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, \
-    IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Comment, Genre, Titles, User
 
 
-from .permissions import (IsAdmin, IsAdminOrReadOnly)
 from .filters import TitlesFilter
+from .permissions import (IsAdmin, IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
                           RegisterDataSerializer, TokenSerializer,
                           UserEditSerializer, UserSerializer)
+from reviews.models import Category, Comment, Genre, Titles, User
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

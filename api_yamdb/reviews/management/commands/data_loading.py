@@ -3,7 +3,8 @@ import csv
 from django.conf import settings
 from django.core.management import BaseCommand
 
-from reviews.models import Category, Genre, Titles, TitlesGenre, Review, User, Comment
+from reviews.models import (Category, Genre, Titles, TitlesGenre, Review, User,
+                            Comment)
 
 path = f'{settings.BASE_DIR}/static/data'
 
@@ -74,7 +75,8 @@ class TitlesGenre(BaseCommand):
 
         for row in csv.DictReader(open(f'{path}/genre_title.csv')):
             genre_title = TitlesGenre(
-                id=row['id'], titles_id=row['title_id'], genre_id=row['genre_id']
+                id=row['id'], titles_id=row['title_id'],
+                genre_id=row['genre_id']
             )
             genre_title.save()
 
@@ -138,5 +140,3 @@ class Command(BaseCommand):
             comment.save()
 
         print('Данные в модель Comment загружены')
-
-
