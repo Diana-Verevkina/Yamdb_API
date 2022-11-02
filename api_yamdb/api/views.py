@@ -9,10 +9,11 @@ from rest_framework.permissions import IsAuthenticated, \
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Comment, Genre, Titles, Review, User
+from reviews.models import Category, Comment, Genre, Title, Review, User
+from django.core.exceptions import PermissionDenied
 
 
-from api.permissions import (IsAdmin, IsAdminOrReadOnly)
+from api.permissions import IsAdmin, IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
@@ -25,7 +26,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    # pagination_class = PageNumberPagination
+    pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
@@ -42,7 +43,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    # pagination_class = PageNumberPagination
+    pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
@@ -55,7 +56,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
+    queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
@@ -68,35 +69,56 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    # pagination_class = PageNumberPagination
-    # http_method_names = ['get']
-    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         serializer.save(author=self.request.user, title=title)
+
+    def perform_update(self, serializer):
+        if serializer.instance.author != self.request.user:
+            raise PermissionDenied('Изменение чужих отзывов запрещено!')
+        super(ReviewViewSet, self).perform_update(serializer)
+
+    def perform_destroy(self, instance):
+        if self.request.user.is_moderator:
+            instance = self.get_object()
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        raise PermissionDenied('Удаление чужих отзывов запрещено!')    
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    # pagination_class = PageNumberPagination
-    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
-        return review.comments
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
         serializer.save(author=self.request.user, review=review)
+    
+    def perform_update(self, serializer):
+        if serializer.instance.author != self.request.user:
+            raise PermissionDenied('Изменение чужих комментариев запрещено!')
+        super(CommentViewSet, self).perform_update(serializer)
 
+    def perform_destroy(self, instance):
+        if self.request.user.is_moderator:
+            instance = self.get_object()
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        raise PermissionDenied('Удаление чужих комментариев запрещено!')    
 
 
 @api_view(["POST"])
@@ -143,7 +165,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # pagination_class = PageNumberPagination
+    pagination_class = PageNumberPagination
     permission_classes = (IsAdmin,)
 
     @action(

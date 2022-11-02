@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -86,7 +87,7 @@ class Genre(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField(verbose_name='Название произведения',
                             max_length=200)
     year = models.IntegerField(verbose_name='Год произведения')
@@ -102,47 +103,58 @@ class Titles(models.Model):
                                  null=True, related_name='category',
                                  help_text='Категория произведения')
 
+    rating = models.IntegerField()
+
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
+    
+    @property
+    def rating(self):
+        return self.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitlesGenre(models.Model):
-    titles = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    titles = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'{self.titles} {self.genre}'
 
-
 class Review(models.Model):
     VALUE = (
-    ('1', '1'),
-    ('2', '2'),
-    ('3', '3'),
-    ('4', '4'),
-    ('5', '5'),
-    ('6', '6'),
-    ('7', '7'),
-    ('8', '8'),
-    ('9', '9'),
-    ('10', '10')
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+    (6, '6'),
+    (7, '7'),
+    (8, '8'),
+    (9, '9'),
+    (10, '10')
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE,
+        Title, on_delete=models.CASCADE,
         related_name='reviews', blank=True, null=True)
     text = models.TextField()
     score = models.CharField(max_length=2, choices=VALUE, default=1)
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+    
+    # def __str__(self):
+    #     return self.text
+  
+    class Meta:
+        unique_together = ('title', 'author',)
 
-    def __str__(self):
-        return self.text
+    
+    
 
 
 class Comment(models.Model):
