@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Comment, Genre, Titles, Review, User
+from reviews.models import Category, Comment, Genre, Title, Review, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -24,8 +24,8 @@ class TitlesSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
 
     class Meta:
-        model = Titles
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
 
 
 class TitleCUDSerializer(serializers.ModelSerializer):
@@ -35,14 +35,14 @@ class TitleCUDSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), slug_field='slug')
 
     class Meta:
-        model = Titles
+        model = Title
         fields = ['id', 'name', 'year', 'description', 'genre', 'category']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
 
     title = serializers.SlugRelatedField(
-        slug_field='name',
+        slug_field='id',
         read_only=True,
     )
     author = serializers.SlugRelatedField(
@@ -55,7 +55,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context['request']
         author = request.user
         title_id = self.context['view'].kwargs.get('title_id')
-        title = get_object_or_404(Titles, pk=title_id)
+        title = get_object_or_404(Title, pk=title_id)
         if request.method == 'POST':
             if Review.objects.filter(title=title, author=author).exists():
                 raise ValidationError('Вы не можете добавить более'
@@ -63,7 +63,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        fields = ['id', 'author', 'score', 'text', 'pub_date']
+        fields = ['id', 'author', 'score', 'text', 'pub_date', 'title']
         model = Review
 
 
