@@ -22,6 +22,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
 
+
     class Meta:
         model = Titles
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
@@ -40,10 +41,10 @@ class TitleCUDSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
 
-    title = serializers.SlugRelatedField(
-        slug_field='name',
-        read_only=True,
-    )
+    # title = serializers.SlugRelatedField(
+    #     slug_field='id',
+    #     read_only=True,
+    # )
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),
         slug_field='username',
@@ -62,7 +63,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        fields = ['id', 'author', 'score', 'text', 'pub_date']
+        fields = ['id', 'author', 'score', 'text', 'pub_date', 'title']
         model = Review
 
 
