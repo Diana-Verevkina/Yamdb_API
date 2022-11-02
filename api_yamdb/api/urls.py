@@ -34,6 +34,3 @@ urlpatterns = [
     path('v1/auth/signup/', register, name='register'),
     path('v1/auth/token/', get_jwt_token, name='token')
 ]
-
-
-
