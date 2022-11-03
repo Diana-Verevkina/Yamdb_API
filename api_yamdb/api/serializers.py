@@ -7,29 +7,37 @@ from reviews.models import Category, Comment, Genre, Title, Review, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализер для модели Category."""
+
     class Meta:
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализер для модели Genre."""
 
     class Meta:
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         model = Genre
 
 
 class TitlesSerializer(serializers.ModelSerializer):
+    """Сериализер для модели Title для GET методов."""
+
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category',
-                  'rating')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        read_only_fields = ('id', 'name', 'year', 'description',
+                            'genre', 'category')
 
 
 class TitleCUDSerializer(serializers.ModelSerializer):
+    """Сериализер для модели Title для CUD методов."""
+
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(), slug_field='slug', many=True)
     category = serializers.SlugRelatedField(
@@ -37,7 +45,7 @@ class TitleCUDSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ['id', 'name', 'year', 'description', 'genre', 'category']
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -64,7 +72,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        fields = ['id', 'author', 'score', 'text', 'pub_date', 'title']
+        fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
         model = Review
 
 
@@ -74,7 +82,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ['id', 'author', 'text', 'pub_date']
+        fields = ('id', 'author', 'text', 'pub_date')
         model = Comment
 
 

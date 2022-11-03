@@ -103,18 +103,12 @@ class Title(models.Model):
                                  null=True, related_name='category',
                                  help_text='Категория произведения')
 
-    rating = models.IntegerField()
-
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
-
-    @property
-    def rating(self):
-        return self.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitlesGenre(models.Model):

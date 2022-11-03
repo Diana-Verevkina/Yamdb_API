@@ -1,9 +1,10 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters, status, permissions
+from rest_framework import viewsets, filters, status, permissions, mixins
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -19,7 +20,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
 from reviews.models import Category, Genre, Title, Review, User
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+    mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -36,7 +38,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+    mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
@@ -54,7 +57,8 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(
+        rating=Avg('reviews__score')).order_by('id')
     filter_backends = (DjangoFilterBackend,)
     # filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
