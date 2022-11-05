@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .filters import TitlesFilter
-from .permissions import (IsAdmin, IsAdminOrReadOnly)
+from .permissions import (IsAdmin, IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
@@ -57,8 +57,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(
-        rating=Avg('reviews__score')).order_by('id')
+    queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
     # filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
@@ -76,52 +75,39 @@ class ReviewViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs.get("title_pk"))
+
     def get_queryset(self):
-        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_title())
 
-    def perform_update(self, serializer):
-        if serializer.instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужих отзывов запрещено!')
-        super(ReviewViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        if self.request.user.is_moderator:
-            instance = self.get_object()
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        raise PermissionDenied('Удаление чужих отзывов запрещено!')
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (IsAdminOrReadOnly(),)
+        return (IsAdminModeratorOwnerOrReadOnly(),)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def get_review(self):
+        return get_object_or_404(Review, id=self.kwargs.get("review_pk"))
+
     def get_queryset(self):
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
-        return review.comments.all()
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
-        serializer.save(author=self.request.user, review=review)
+        serializer.save(author=self.request.user, review=self.get_review())
 
-    def perform_update(self, serializer):
-        if serializer.instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужих комментариев запрещено!')
-        super(CommentViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        if self.request.user.is_moderator:
-            instance = self.get_object()
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        raise PermissionDenied('Удаление чужих комментариев запрещено!')
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (IsAdminOrReadOnly(),)
+        return (IsAdminModeratorOwnerOrReadOnly(),)
 
 
 @api_view(["POST"])
