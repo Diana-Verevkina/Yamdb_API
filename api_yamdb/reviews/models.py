@@ -59,32 +59,38 @@ class User(AbstractUser):
         ]
 
 
-class Category(models.Model):
-    name = models.CharField(verbose_name='Название категории',
+class Category_Genre_Model(models.Model):
+    """Абстрактная модель. Добавляет name, slug."""
+    name = models.CharField(verbose_name='Название',
                             max_length=256)
-    slug = models.SlugField(verbose_name='Слаг категории', unique=True,
+    slug = models.SlugField(verbose_name='Слаг', unique=True,
                             max_length=50)
 
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        # Это абстрактная модель:
+        abstract = True
+        ordering = ['name']
 
     def __str__(self):
         return self.name
 
 
-class Genre(models.Model):
+class Category(Category_Genre_Model):
+
+    class Meta(Category_Genre_Model.Meta):
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+
+class Genre(Category_Genre_Model):
     name = models.CharField(verbose_name='Название жанра',
                             max_length=256)
     slug = models.SlugField(verbose_name='Слаг жанра', unique=True,
                             max_length=50)
 
-    class Meta:
+    class Meta(Category_Genre_Model.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-
-    def __str__(self):
-        return self.name
 
 
 class Title(models.Model):

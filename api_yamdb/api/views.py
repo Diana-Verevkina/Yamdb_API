@@ -20,14 +20,17 @@ from .serializers import (CategorySerializer, CommentSerializer,
 from reviews.models import Category, Genre, Title, Review, User
 
 
-class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-    mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CategoryGenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                           mixins.ListModelMixin, viewsets.GenericViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
+
+
+class CategoryViewSet(CategoryGenreViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
             lookup_field='slug', url_name='category_slug')
@@ -38,14 +41,9 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class GenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-    mixins.ListModelMixin, viewsets.GenericViewSet):
+class GenreViewSet(CategoryViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    pagination_class = PageNumberPagination
-    permission_classes = (IsAdminOrReadOnly,)
 
     @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
             lookup_field='slug', url_name='genre_slug')
@@ -60,7 +58,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(
         rating=Avg('reviews__score')).order_by('id')
     filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = ('genre__slug', 'category__slug', 'name', 'year')
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitlesFilter
