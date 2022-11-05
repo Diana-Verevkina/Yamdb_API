@@ -71,7 +71,12 @@ class ReviewSerializer(serializers.ModelSerializer):
             ).exists():
                 raise ValidationError('Вы не можете добавить более'
                                       'одного отзыва на произведение')
+            if data['score'] > 10:
+                raise ValidationError("Оценка не может быть больше 10")
+            if data['score'] < 1:
+                raise ValidationError("Оценка не может быть меньше 1")
         return data
+
 
     class Meta:
         fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
