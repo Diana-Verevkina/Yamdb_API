@@ -1,6 +1,7 @@
 from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class User(AbstractUser):
@@ -125,42 +126,62 @@ class TitlesGenre(models.Model):
         return f'{self.titles} {self.genre}'
 
 
-class Review(models.Model):
-    VALUE = (
-        (1, '1'),
-        (2, '2'),
-        (3, '3'),
-        (4, '4'),
-        (5, '5'),
-        (6, '6'),
-        (7, '7'),
-        (8, '8'),
-        (9, '9'),
-        (10, '10')
-    )
+class ReviewAbstract(models.Model):
+    class Meta:
+        abstract = True
+
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
+        User, on_delete=models.CASCADE, verbose_name='Автор', max_length=200)
+    text = models.TextField(verbose_name='Текст ревью',
+                            max_length=200)
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.text
+
+
+class Review(ReviewAbstract):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
-        related_name='reviews', blank=True, null=True)
-    text = models.TextField()
-    score = models.CharField(max_length=2, choices=VALUE, default=1)
-    pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        related_name='reviews',
+        blank=True, null=True,
+        verbose_name='Произведение',
+        max_length=200
+    )
+    score = models.IntegerField(
+        verbose_name='Оценка',
+        default=1,
+        validators=[
+        MaxValueValidator(10),
+        MinValueValidator(1)
+        ]
+    )
 
     class Meta:
-        unique_together = ('title', 'author',)
+        verbose_name = 'Ревью'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_title'
+            )
+        ]
+
+    def __str__(self):
+        return self.text
 
 
-class Comment(models.Model):
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
+class Comment(ReviewAbstract):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
-        related_name='comments', blank=True, null=True)
-    text = models.TextField()
-    pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        verbose_name='Комментарий',
+        related_name='comments',
+        max_length=200,
+        blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return self.text

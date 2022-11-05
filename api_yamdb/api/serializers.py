@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
+from django.db.models import Avg
 
 from reviews.models import Category, Comment, Genre, Title, Review, User
 
@@ -28,13 +29,16 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
         read_only_fields = ('id', 'name', 'year', 'description',
-                            'genre', 'category')
+                            'genre', 'category', 'rating')
 
+    def get_rating(self, instance):
+        return instance.reviews.aggregate(Avg('score'))['score__avg']
 
 class TitleCUDSerializer(serializers.ModelSerializer):
     """Сериализер для модели Title для CUD методов."""
@@ -58,24 +62,22 @@ class TitleCUDSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-
-    title = serializers.SlugRelatedField(
-        slug_field='id',
-        read_only=True,
-    )
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),
         slug_field='username',
         read_only=True
     )
+    score = serializers.IntegerField()
 
     def validate(self, data):
         request = self.context['request']
-        author = request.user
-        title_id = self.context['view'].kwargs.get('title_id')
-        title = get_object_or_404(Title, pk=title_id)
         if request.method == 'POST':
-            if Review.objects.filter(title=title, author=author).exists():
+            if Review.objects.filter(
+                title=get_object_or_404(
+                    Title,
+                    pk=self.context['view'].kwargs.get('title_pk')),
+                    author=request.user
+            ).exists():
                 raise ValidationError('Вы не можете добавить более'
                                       'одного отзыва на произведение')
         return data
@@ -83,6 +85,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
         model = Review
+        read_only_fields = ('title',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
