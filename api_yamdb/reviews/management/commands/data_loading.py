@@ -25,7 +25,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for model, file in self.model_csv.items():
             if model.objects.exists():
-                print(f'Ошибка. Данные в модель {model.__name__} '
+                raise Exception(f'Ошибка. Данные в модель {model.__name__} '
                       f'уже загружены.')
             else:
                 print(f'Загрузка данных в модель {model.__name__}')

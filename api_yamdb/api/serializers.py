@@ -4,6 +4,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
+from django.conf import settings
+from django.db import models
+from django.core.validators import validate_slug
 
 from reviews.models import Category, Comment, Genre, Title, Review, User
 
@@ -49,6 +52,10 @@ class TitleCUDSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(), slug_field='slug', many=True)
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
+
+    def to_representation(self, value):
+        duration = time.strftime('%M:%S', time.gmtime(value.duration))
+        return 'Track %d: %s (%s)' % (value.order, value.name, duration)
 
     class Meta:
         model = Title
