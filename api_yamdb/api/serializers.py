@@ -67,6 +67,8 @@ class TitleCUDSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализер для модели Review."""
+
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),
         slug_field='username',
@@ -87,6 +89,13 @@ class ReviewSerializer(serializers.ModelSerializer):
                                       'одного отзыва на произведение')
         return data
 
+    def validate_score(self, data):
+        if data > 10:
+            raise ValidationError("Оценка не может быть больше 10")
+        if data < 1:
+            raise ValidationError("Оценка не может быть меньше 1")
+        return data
+        
     class Meta:
         model = Review
         fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
@@ -94,6 +103,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализер для модели Comment."""
+
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )

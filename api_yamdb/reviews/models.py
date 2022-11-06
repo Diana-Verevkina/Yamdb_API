@@ -130,6 +130,7 @@ class TitlesGenre(models.Model):
 
 
 class ReviewAbstract(models.Model):
+    """Материнская модель для моделей Review и Comment"""
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Автор',
@@ -147,7 +148,7 @@ class ReviewAbstract(models.Model):
 
 
 class Review(ReviewAbstract):
-
+    """Отзывы на произведения. Отзыв привязан к определённому произведению"""
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews',
@@ -178,7 +179,7 @@ class Review(ReviewAbstract):
 
 
 class Comment(ReviewAbstract):
-
+    """Комментарии к отзывам. Комментарий привязан к определённому отзыву"""
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
         verbose_name='Комментарий',
