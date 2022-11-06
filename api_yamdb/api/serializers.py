@@ -1,9 +1,9 @@
+from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
-from django.db.models import Avg
 
 from reviews.models import Category, Comment, Genre, Title, Review, User
 
@@ -12,16 +12,16 @@ class CategorySerializer(serializers.ModelSerializer):
     """Сериализер для модели Category."""
 
     class Meta:
-        fields = ('name', 'slug')
         model = Category
+        fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализер для модели Genre."""
 
     class Meta:
-        fields = ('name', 'slug')
         model = Genre
+        fields = ('name', 'slug')
 
 
 class TitlesSerializer(serializers.ModelSerializer):
@@ -33,7 +33,8 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category',
+                  'rating')
         read_only_fields = ('id', 'name', 'year', 'description',
                             'genre', 'category', 'rating')
 
@@ -84,8 +85,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
         model = Review
+        fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
         read_only_fields = ('title',)
 
 
@@ -95,8 +96,8 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'author', 'text', 'pub_date')
         model = Comment
+        fields = ('id', 'author', 'text', 'pub_date')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -113,12 +114,13 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        model = User
         fields = ("username", "email", "first_name",
                   "last_name", "bio", "role")
-        model = User
 
 
 class UserEditSerializer(serializers.ModelSerializer):
+
     class Meta:
         fields = ("username", "email", "first_name",
                   "last_name", "bio", "role")
@@ -144,8 +146,8 @@ class RegisterDataSerializer(serializers.ModelSerializer):
         return value
 
     class Meta:
-        fields = ("username", "email")
         model = User
+        fields = ("username", "email")
 
 
 class TokenSerializer(serializers.Serializer):

@@ -3,6 +3,13 @@ from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+NAME = 256
+SLUG_ROLE = 50
+MAX_LEN = 200
+USERNAME = 150
+EMAIL = 254
+USER_NAMES = 150
+
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
 DEBUG = True

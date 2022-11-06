@@ -1,11 +1,12 @@
-from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 
 class User(AbstractUser):
+
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
@@ -17,17 +18,17 @@ class User(AbstractUser):
 
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
-        unique=True,
+        unique=True, max_length=settings.EMAIL
     )
     username = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=150,
+        max_length=settings.USERNAME,
         null=True,
         unique=True
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=50,
+        max_length=settings.SLUG_ROLE,
         choices=ROLES,
         default=USER
     )
@@ -63,10 +64,11 @@ class User(AbstractUser):
 
 class Category_Genre_Model(models.Model):
     """Абстрактная модель. Добавляет name, slug."""
+
     name = models.CharField(verbose_name='Название',
-                            max_length=256)
+                            max_length=settings.NAME)
     slug = models.SlugField(verbose_name='Слаг', unique=True,
-                            max_length=50)
+                            max_length=settings.SLUG_ROLE)
 
     class Meta:
         # Это абстрактная модель:
@@ -85,10 +87,6 @@ class Category(Category_Genre_Model):
 
 
 class Genre(Category_Genre_Model):
-    name = models.CharField(verbose_name='Название жанра',
-                            max_length=256)
-    slug = models.SlugField(verbose_name='Слаг жанра', unique=True,
-                            max_length=50)
 
     class Meta(Category_Genre_Model.Meta):
         verbose_name = 'Жанр'
@@ -96,8 +94,9 @@ class Genre(Category_Genre_Model):
 
 
 class Title(models.Model):
+
     name = models.CharField(verbose_name='Название произведения',
-                            max_length=200)
+                            max_length=settings.MAX_LEN)
     year = models.IntegerField(
         validators=[MaxValueValidator(timezone.now().year)],
         verbose_name='Год произведения')
@@ -122,6 +121,7 @@ class Title(models.Model):
 
 
 class TitlesGenre(models.Model):
+
     titles = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 
@@ -130,34 +130,37 @@ class TitlesGenre(models.Model):
 
 
 class ReviewAbstract(models.Model):
-    class Meta:
-        abstract = True
 
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name='Автор', max_length=200)
+        User, on_delete=models.CASCADE, verbose_name='Автор',
+        max_length=settings.MAX_LEN)
     text = models.TextField(verbose_name='Текст ревью',
-                            max_length=200)
+                            max_length=settings.MAX_LEN)
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return self.text
 
 
 class Review(ReviewAbstract):
+
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews',
         blank=True, null=True,
         verbose_name='Произведение',
-        max_length=200
+        max_length=settings.MAX_LEN
     )
     score = models.IntegerField(
         verbose_name='Оценка',
         default=1,
         validators=[
-        MaxValueValidator(10),
-        MinValueValidator(1)
+            MaxValueValidator(10),
+            MinValueValidator(1)
         ]
     )
 
@@ -175,11 +178,12 @@ class Review(ReviewAbstract):
 
 
 class Comment(ReviewAbstract):
+
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
         verbose_name='Комментарий',
         related_name='comments',
-        max_length=200,
+        max_length=settings.MAX_LEN,
         blank=True, null=True)
 
     class Meta:
