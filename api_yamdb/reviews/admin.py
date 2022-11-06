@@ -30,7 +30,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
-# admin.site.register(Title, TitleAdmin)
+admin.site.register(Title, TitleAdmin)
 admin.site.register(User)
 admin.site.register(Review)
 admin.site.register(Comment)
