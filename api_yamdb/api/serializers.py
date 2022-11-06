@@ -53,10 +53,6 @@ class TitleCUDSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
 
-    def to_representation(self, value):
-        duration = time.strftime('%M:%S', time.gmtime(value.duration))
-        return 'Track %d: %s (%s)' % (value.order, value.name, duration)
-
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
