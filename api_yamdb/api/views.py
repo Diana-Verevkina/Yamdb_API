@@ -26,32 +26,17 @@ class CategoryGenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
     search_fields = ('name',)
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
+    lookup_field = "slug"
 
 
 class CategoryViewSet(CategoryGenreViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
-            lookup_field='slug', url_name='category_slug')
-    def delete_category(self, request, slug):
-        category = self.get_object()
-        serializer = CategorySerializer(category)
-        category.delete()
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
-
 
 class GenreViewSet(CategoryViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-
-    @action(detail=False, url_path=r'(?P<slug>\w+)', methods=['delete'],
-            lookup_field='slug', url_name='genre_slug')
-    def delete_category(self, request, slug):
-        genre = self.get_object()
-        serializer = GenreSerializer(genre)
-        genre.delete()
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):

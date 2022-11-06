@@ -40,6 +40,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     def get_rating(self, instance):
         return instance.reviews.aggregate(Avg('score'))['score__avg']
 
+
 class TitleCUDSerializer(serializers.ModelSerializer):
     """Сериализер для модели Title для CUD методов."""
 

@@ -2,6 +2,7 @@ from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -97,7 +98,9 @@ class Genre(Category_Genre_Model):
 class Title(models.Model):
     name = models.CharField(verbose_name='Название произведения',
                             max_length=200)
-    year = models.IntegerField(verbose_name='Год произведения')
+    year = models.IntegerField(
+        validators=[MaxValueValidator(timezone.now().year)],
+        verbose_name='Год произведения')
     description = models.TextField(verbose_name='Описание', blank=True,
                                    null=True)
     genre = models.ManyToManyField(Genre, through='TitlesGenre',

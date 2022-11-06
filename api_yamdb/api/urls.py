@@ -16,27 +16,13 @@ router_v1.register('titles', TitlesViewSet, basename='titles')
 router_v1.register(r'users', UserViewSet)
 
 
-review_router = routers.NestedSimpleRouter(
-    router_v1,
-    r'titles',
-    lookup='title')
-review_router.register(
-    r'reviews',
-    ReviewViewSet,
-    basename='review'
-)
+review_router = routers.NestedSimpleRouter(router_v1, r'titles',
+                                           lookup='title')
+review_router.register(r'reviews', ReviewViewSet, basename='review')
 
-comment_router = routers.NestedSimpleRouter(
-    review_router,
-    r'reviews',
-    lookup='review')
-comment_router.register(
-    r'comments',
-    CommentViewSet,
-    basename='comment'
-)
-
-
+comment_router = routers.NestedSimpleRouter(review_router, r'reviews',
+                                            lookup='review')
+comment_router.register(r'comments', CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),

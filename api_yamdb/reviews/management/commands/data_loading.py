@@ -3,14 +3,14 @@ import csv
 from django.conf import settings
 from django.core.management import BaseCommand
 
-from reviews.models import (Category, Genre, Titles, TitlesGenre, Review, User,
+from reviews.models import (Category, Genre, Title, TitlesGenre, Review, User,
                             Comment)
 
 path = f'{settings.BASE_DIR}/static/data'
 
 
-class Category(BaseCommand):
-    help = 'Loading data into Category from csv'
+class Command(BaseCommand):
+    help = 'Loading all data from csv'
 
     def handle(self, *args, **options):
         if Category.objects.exists():
@@ -23,14 +23,8 @@ class Category(BaseCommand):
                 id=row['id'], name=row['name'], slug=row['slug']
             )
             category.save()
-
         print('Данные в модель Category загружены')
 
-
-class Genre(BaseCommand):
-    help = 'Loading data into Genre from csv'
-
-    def handle(self, *args, **options):
         if Genre.objects.exists():
             print('Ошибка. Данные в модель Genre уже загружены.')
 
@@ -44,30 +38,20 @@ class Genre(BaseCommand):
 
         print('Данные в модель Genre загружены')
 
+        if Title.objects.exists():
+            print('Ошибка. Данные в модель Title уже загружены.')
 
-class Titles(BaseCommand):
-    help = 'Loading data into Titles from csv'
-
-    def handle(self, *args, **options):
-        if Titles.objects.exists():
-            print('Ошибка. Данные в модель Titles уже загружены.')
-
-        print('Загрузка данных в модель Titles')
+        print('Загрузка данных в модель Title')
 
         for row in csv.DictReader(open(f'{path}/titles.csv')):
-            titles = Titles(
+            titles = Title(
                 id=row['id'], name=row['name'], year=row['year'],
                 category_id=row['category']
             )
             titles.save()
 
-        print('Данные в модель Titles загружены')
+        print('Данные в модель Title загружены')
 
-
-class TitlesGenre(BaseCommand):
-    help = 'Loading data into TitlesGenre from csv'
-
-    def handle(self, *args, **options):
         if TitlesGenre.objects.exists():
             print('Ошибка. Данные в модель TitlesGenre уже загружены.')
 
@@ -82,11 +66,6 @@ class TitlesGenre(BaseCommand):
 
         print('Данные в модель TitlesGenre загружены')
 
-
-class User(BaseCommand):
-    help = 'Loading data into User from csv'
-
-    def handle(self, *args, **options):
         if User.objects.exists():
             print('Ошибка. Данные в модель User уже загружены.')
 
@@ -102,11 +81,6 @@ class User(BaseCommand):
 
         print('Данные в модель User загружены')
 
-
-class Review(BaseCommand):
-    help = 'Loading data into Review from csv'
-
-    def handle(self, *args, **options):
         if Review.objects.exists():
             print('Ошибка. Данные в модель Review уже загружены.')
 
@@ -122,11 +96,6 @@ class Review(BaseCommand):
 
         print('Данные в модель Review загружены')
 
-
-class Command(BaseCommand):
-    help = 'Loading data into Comment from csv'
-
-    def handle(self, *args, **options):
         if Comment.objects.exists():
             print('Ошибка. Данные в модель Comment уже загружены.')
 
@@ -140,3 +109,6 @@ class Command(BaseCommand):
             comment.save()
 
         print('Данные в модель Comment загружены')
+
+
+
