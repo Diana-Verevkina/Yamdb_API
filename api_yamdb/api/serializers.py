@@ -57,6 +57,9 @@ class TitleCUDSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
+    def to_representation(self, instance):
+        return TitlesSerializer(instance).data
+
     def validate_year(self, value):
         current_year = timezone.now().year
         if not 0 <= value <= current_year:

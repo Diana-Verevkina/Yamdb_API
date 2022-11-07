@@ -63,7 +63,6 @@ class User(AbstractUser):
 
 
 class Category_Genre_Model(models.Model):
-    """Абстрактная модель. Добавляет name, slug."""
 
     name = models.CharField(verbose_name='Название',
                             max_length=settings.NAME)
@@ -71,7 +70,6 @@ class Category_Genre_Model(models.Model):
                             max_length=settings.SLUG_ROLE)
 
     class Meta:
-        # Это абстрактная модель:
         abstract = True
         ordering = ['name']
 
@@ -130,7 +128,6 @@ class TitlesGenre(models.Model):
 
 
 class ReviewAbstract(models.Model):
-    """Материнская модель для моделей Review и Comment"""
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Автор',
@@ -148,7 +145,7 @@ class ReviewAbstract(models.Model):
 
 
 class Review(ReviewAbstract):
-    """Отзывы на произведения. Отзыв привязан к определённому произведению"""
+
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews',
@@ -165,7 +162,7 @@ class Review(ReviewAbstract):
         ]
     )
 
-    class Meta:
+    class Meta(ReviewAbstract.Meta):
         verbose_name = 'Ревью'
         constraints = [
             models.UniqueConstraint(
@@ -174,12 +171,9 @@ class Review(ReviewAbstract):
             )
         ]
 
-    def __str__(self):
-        return self.text
-
 
 class Comment(ReviewAbstract):
-    """Комментарии к отзывам. Комментарий привязан к определённому отзыву"""
+
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
         verbose_name='Комментарий',
@@ -187,9 +181,6 @@ class Comment(ReviewAbstract):
         max_length=settings.MAX_LEN,
         blank=True, null=True)
 
-    class Meta:
+    class Meta(ReviewAbstract.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-
-    def __str__(self):
-        return self.text
