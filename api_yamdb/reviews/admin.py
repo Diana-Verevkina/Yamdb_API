@@ -16,6 +16,7 @@ class GenreAdmin(admin.ModelAdmin):
 class TitleAdmin(admin.ModelAdmin):
     list_display = ('name', 'year', 'description', 'genre', 'category')
     search_fields = ('name',)
+    raw_id_fields = ('genre',)
 
 
 class ReviewAdmin(admin.ModelAdmin):
