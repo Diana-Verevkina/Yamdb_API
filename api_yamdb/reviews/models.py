@@ -63,6 +63,7 @@ class User(AbstractUser):
 
 
 class Category_Genre_Model(models.Model):
+    """Материнская модель для моделей Category и Genre."""
 
     name = models.CharField(verbose_name='Название',
                             max_length=settings.NAME)
@@ -78,6 +79,7 @@ class Category_Genre_Model(models.Model):
 
 
 class Category(Category_Genre_Model):
+    """Категории произведений."""
 
     class Meta(Category_Genre_Model.Meta):
         verbose_name = 'Категория'
@@ -85,6 +87,7 @@ class Category(Category_Genre_Model):
 
 
 class Genre(Category_Genre_Model):
+    """Жанры произведений."""
 
     class Meta(Category_Genre_Model.Meta):
         verbose_name = 'Жанр'
@@ -92,7 +95,7 @@ class Genre(Category_Genre_Model):
 
 
 class Title(models.Model):
-
+    """Произведения."""
     name = models.CharField(verbose_name='Название произведения',
                             max_length=settings.MAX_LEN)
     year = models.IntegerField(
@@ -119,7 +122,7 @@ class Title(models.Model):
 
 
 class TitlesGenre(models.Model):
-
+    """Реализация связи один ко многим произведений и жанров."""
     titles = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 
@@ -128,6 +131,7 @@ class TitlesGenre(models.Model):
 
 
 class ReviewAbstract(models.Model):
+    """Материнская модель для моделей Review и Comment."""
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Автор',
@@ -145,6 +149,7 @@ class ReviewAbstract(models.Model):
 
 
 class Review(ReviewAbstract):
+    """Отзывы на произведения. Отзыв привязан к определённому произведению."""
 
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
@@ -173,6 +178,7 @@ class Review(ReviewAbstract):
 
 
 class Comment(ReviewAbstract):
+    """Комментарии к отзывам. Комментарий привязан к определённому отзыву."""
 
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,

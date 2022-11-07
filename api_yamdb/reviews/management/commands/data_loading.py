@@ -10,7 +10,7 @@ path = f'{settings.BASE_DIR}/static/data'
 
 
 class Command(BaseCommand):
-    help = 'Loading all data from csv'
+    help = 'Загрузка данных в БД из файлов csv'
 
     model_csv = {
         Category: 'category',
