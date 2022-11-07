@@ -1,4 +1,5 @@
 from django.db.models import Avg
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -113,6 +114,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class MixinValidatorUsername:
+
     def validate_username(self, value):
         if value.lower() == 'me':
             raise ValidationError('Username не должно быть "me"')
@@ -124,6 +126,7 @@ class MixinValidatorUsername:
 
 class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
     """Сериалайзер для модели User."""
+
     username = serializers.CharField(
         validators=[
             UniqueValidator(queryset=User.objects.all())
@@ -144,6 +147,7 @@ class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
 
 class UserEditSerializer(UserSerializer):
     """Сериалиазация модели User при get и patch запросах."""
+
     class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
@@ -158,5 +162,6 @@ class RegisterDataSerializer(UserSerializer):
 
 class TokenSerializer(serializers.Serializer):
     """"Проверка confirmation_code при регистрации."""
+
     username = serializers.CharField()
     confirmation_code = serializers.CharField()

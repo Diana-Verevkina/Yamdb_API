@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from reviews.models import Category, Genre, Title, Review, User
+
 from .filters import TitlesFilter
 from .permissions import (
     IsAdmin, IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly
@@ -13,7 +15,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
                           TitleCUDSerializer, ReviewSerializer,
                           UserEditSerializer, UserSerializer)
-from reviews.models import Category, Genre, Title, Review, User
 
 
 class CategoryGenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,

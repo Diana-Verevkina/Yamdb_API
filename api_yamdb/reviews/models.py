@@ -6,7 +6,8 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    """Модель пользователя"""
+    """Модель пользователя."""
+
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
@@ -48,9 +49,6 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    def __str__(self):
-        return f'{self.username}({self.email})'
-
     class Meta:
         ordering = ('id',)
         verbose_name = 'Пользователь'
@@ -62,6 +60,9 @@ class User(AbstractUser):
                 name='username_is_not_me'
             )
         ]
+
+    def __str__(self):
+        return f'{self.username}({self.email})'
 
 
 class Category_Genre_Model(models.Model):
