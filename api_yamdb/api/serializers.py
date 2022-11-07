@@ -123,7 +123,7 @@ class MixinValidatorUsername:
 
 
 class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
-    """Сериалайзер для модели User"""
+    """Сериалайзер для модели User."""
     username = serializers.CharField(
         validators=[
             UniqueValidator(queryset=User.objects.all())
@@ -143,13 +143,13 @@ class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
 
 
 class UserEditSerializer(UserSerializer):
-    """Сериалиазация модели User при get и patch запросах"""
+    """Сериалиазация модели User при get и patch запросах."""
     class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
 
 class RegisterDataSerializer(UserSerializer):
-    """Сериализатор модели User, используемый при регистрации"""
+    """Сериализатор модели User, используемый при регистрации."""
 
     class Meta(UserSerializer.Meta):
         model = User
@@ -157,6 +157,6 @@ class RegisterDataSerializer(UserSerializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    """"Проверка confirmation_code при регистрации """
+    """"Проверка confirmation_code при регистрации."""
     username = serializers.CharField()
     confirmation_code = serializers.CharField()

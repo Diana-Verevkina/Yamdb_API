@@ -49,7 +49,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """Методы обработки отзывов"""
+    """Методы обработки отзывов."""
 
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
@@ -71,7 +71,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """Методы обработки комментариев"""
+    """Методы обработки комментариев."""
 
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
