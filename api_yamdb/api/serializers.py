@@ -60,9 +60,7 @@ class TitleCUDSerializer(serializers.ModelSerializer):
     def validate_year(self, value):
         current_year = timezone.now().year
         if not 0 <= value <= current_year:
-            raise serializers.ValidationError(
-                'Проверьте год создания произведения.'
-            )
+            raise ValidationError('Проверьте год создания произведения.')
         return value
 
 
@@ -91,11 +89,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate_score(self, data):
         if data > 10:
-            raise ValidationError("Оценка не может быть больше 10")
+            raise ValidationError('Оценка не может быть больше 10')
         if data < 1:
-            raise ValidationError("Оценка не может быть меньше 1")
+            raise ValidationError('Оценка не может быть меньше 1')
         return data
-        
+
     class Meta:
         model = Review
         fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
@@ -114,7 +112,18 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'pub_date')
 
 
-class UserSerializer(serializers.ModelSerializer):
+class MixinValidatorUsername:
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise ValidationError('Username не должно быть "me"')
+        if len(value) > settings.USERNAME:
+            raise ValidationError(
+                'Длина username должна быть меньше 151 символа')
+        return value
+
+
+class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
+    """Сериалайзер для модели User"""
     username = serializers.CharField(
         validators=[
             UniqueValidator(queryset=User.objects.all())
@@ -129,41 +138,25 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "first_name",
-                  "last_name", "bio", "role")
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
 
 
-class UserEditSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ("username", "email", "first_name",
-                  "last_name", "bio", "role")
-        model = User
+class UserEditSerializer(UserSerializer):
+    """Сериалиазация модели User при get и patch запросах"""
+    class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
 
-class RegisterDataSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-    email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
+class RegisterDataSerializer(UserSerializer):
+    """Сериализатор модели User, используемый при регистрации"""
 
-    def validate_username(self, value):
-        if value.lower() == "me":
-            raise serializers.ValidationError("Username 'me' is not valid")
-        return value
-
-    class Meta:
+    class Meta(UserSerializer.Meta):
         model = User
-        fields = ("username", "email")
+        fields = ('username', 'email')
 
 
 class TokenSerializer(serializers.Serializer):
+    """"Проверка confirmation_code при регистрации """
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
