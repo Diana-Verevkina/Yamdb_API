@@ -22,7 +22,7 @@ class Command(BaseCommand):
         Comment: 'comments',
     }
 
-    def handle(self, *args, **options):
+    """def handle(self, *args, **options):
         for model, file in self.model_csv.items():
             if model.objects.exists():
                 raise Exception(f'Ошибка. Данные в модель {model.__name__} '
@@ -65,4 +65,4 @@ class Command(BaseCommand):
                         )
 
                     columns.save()
-                print(f'Данные в модель {model.__name__} загружены')
+                print(f'Данные в модель {model.__name__} загружены')"""
