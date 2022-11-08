@@ -4,7 +4,7 @@ from datetime import timedelta
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 NAME = 256
-SLUG_ROLE = 50
+SLUG = 50
 MAX_LEN = 200
 USERNAME = 150
 EMAIL = 254

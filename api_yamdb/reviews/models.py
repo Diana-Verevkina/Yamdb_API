@@ -28,7 +28,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=settings.SLUG_ROLE,
+        max_length=settings.SLUG,
         choices=ROLES,
         default=USER
     )
@@ -71,11 +71,11 @@ class Category_Genre_Model(models.Model):
     name = models.CharField(verbose_name='Название',
                             max_length=settings.NAME)
     slug = models.SlugField(verbose_name='Слаг', unique=True,
-                            max_length=settings.SLUG_ROLE)
+                            max_length=settings.SLUG)
 
     class Meta:
         abstract = True
-        ordering = ['name']
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
