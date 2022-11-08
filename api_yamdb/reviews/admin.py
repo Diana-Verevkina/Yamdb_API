@@ -13,8 +13,15 @@ class GenreAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+class TitleInline(admin.TabularInline):
+    model = Title.genre.through
+
+
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'year', 'description', 'genre', 'category')
+    list_display = ('name', 'year', 'description', 'category')
+    inlines = [
+        TitleInline,
+    ]
     search_fields = ('name',)
     raw_id_fields = ('genre',)
 

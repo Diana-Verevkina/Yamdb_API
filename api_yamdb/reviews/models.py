@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Index
 from django.utils import timezone
 
 
@@ -101,7 +102,7 @@ class Title(models.Model):
     """Произведения."""
     name = models.CharField(verbose_name='Название произведения',
                             max_length=settings.MAX_LEN)
-    year = models.IntegerField(
+    year = models.SmallIntegerField(
         validators=[MaxValueValidator(timezone.now().year)],
         verbose_name='Год произведения')
     description = models.TextField(verbose_name='Описание', blank=True,
@@ -119,6 +120,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        Index(fields=['year'])
 
     def __str__(self):
         return self.name

@@ -30,7 +30,8 @@ class Command(BaseCommand):
                       f'уже загружены.')
             else:
                 print(f'Загрузка данных в модель {model.__name__}')
-                for row in csv.DictReader(open(f'{path}/{file}.csv')):
+                for row in csv.DictReader(open(f'{path}/{file}.csv',
+                                               encoding='utf-8')):
                     columns = loading(model, row)
                     columns.save()
                 print(f'Данные в модель {model.__name__} загружены')

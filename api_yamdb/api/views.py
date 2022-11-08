@@ -1,10 +1,12 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters, status, permissions, mixins
+from rest_framework import viewsets, status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from .mixins import CategoryGenreViewSet
 from .permissions import (
     IsAdmin, IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly
 )
@@ -14,15 +16,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleCUDSerializer, ReviewSerializer,
                           UserEditSerializer, UserSerializer)
 from reviews.models import Category, Genre, Title, Review, User
-
-
-class CategoryGenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                           mixins.ListModelMixin, viewsets.GenericViewSet):
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    pagination_class = PageNumberPagination
-    permission_classes = (IsAdminOrReadOnly,)
-    lookup_field = 'slug'
 
 
 class CategoryViewSet(CategoryGenreViewSet):
@@ -36,11 +29,13 @@ class GenreViewSet(CategoryViewSet):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    filter_backends = (DjangoFilterBackend,)
+    queryset = Title.objects.all().annotate(
+        rating=Avg('reviews__score')).order_by('id')
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitlesFilter
+    # ordering_fields =
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
