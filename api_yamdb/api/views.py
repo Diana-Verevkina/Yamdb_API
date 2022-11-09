@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters, status, permissions, mixins
@@ -36,7 +37,7 @@ class GenreViewSet(CategoryViewSet):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     filter_backends = (DjangoFilterBackend,)
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
@@ -51,10 +52,10 @@ class TitlesViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_title(self):
-        return get_object_or_404(Title, id=self.kwargs.get('title_pk'))
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
 
     def get_queryset(self):
         return self.get_title().reviews.all()
@@ -62,30 +63,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, title=self.get_title())
 
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (IsAdminOrReadOnly(),)
-        return (IsAdminModeratorOwnerOrReadOnly(),)
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_review(self):
-        return get_object_or_404(Review, id=self.kwargs.get('review_pk'))
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
 
     def get_queryset(self):
         return self.get_review().comments.all()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
-
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (IsAdminOrReadOnly(),)
-        return (IsAdminModeratorOwnerOrReadOnly(),)
 
 
 class UserViewSet(viewsets.ModelViewSet):
