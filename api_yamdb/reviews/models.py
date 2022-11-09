@@ -3,7 +3,8 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Index
-from django.utils import timezone
+
+from .validators import get_year
 
 
 class User(AbstractUser):
@@ -102,8 +103,8 @@ class Title(models.Model):
     """Произведения."""
     name = models.CharField(verbose_name='Название произведения',
                             max_length=settings.MAX_LEN)
-    year = models.SmallIntegerField(
-        validators=[MaxValueValidator(timezone.now().year)],
+    year = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(get_year)],
         verbose_name='Год произведения')
     description = models.TextField(verbose_name='Описание', blank=True,
                                    null=True)

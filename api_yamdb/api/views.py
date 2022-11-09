@@ -35,7 +35,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitlesFilter
-    # ordering_fields =
+    ordering_fields = ['name', 'year']
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
