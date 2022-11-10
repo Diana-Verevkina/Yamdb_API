@@ -1,13 +1,14 @@
 from django.db.models import Avg
-from django.conf import settings
 from django.utils import timezone
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Category, Comment, Genre, Title, Review, User
+from api.validators import MixinValidatorUsername
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,7 +40,6 @@ class TitlesSerializer(serializers.ModelSerializer):
                   'rating')
         read_only_fields = ('id', 'name', 'year', 'description',
                             'genre', 'category', 'rating')
-
 
 
 class TitleCUDSerializer(serializers.ModelSerializer):
@@ -117,17 +117,6 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'pub_date')
 
 
-class MixinValidatorUsername:
-
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise ValidationError('Username не должно быть "me"')
-        if len(value) > settings.USERNAME:
-            raise ValidationError(
-                'Длина username должна быть меньше 151 символа')
-        return value
-
-
 class UserSerializer(serializers.ModelSerializer, MixinValidatorUsername):
     """Сериалайзер для модели User."""
 
@@ -156,16 +145,13 @@ class UserEditSerializer(UserSerializer):
         read_only_fields = ('role',)
 
 
-class RegisterDataSerializer(UserSerializer):
+class RegisterDataSerializer(serializers.Serializer, MixinValidatorUsername):
     """Сериализатор модели User, используемый при регистрации."""
-
-    class Meta(UserSerializer.Meta):
-        model = User
-        fields = ('username', 'email')
+    username = serializers.CharField(max_length=settings.USERNAME)
+    email = serializers.EmailField()
 
 
-class TokenSerializer(serializers.Serializer):
+class TokenSerializer(serializers.Serializer, MixinValidatorUsername):
     """"Проверка confirmation_code при регистрации."""
-
-    username = serializers.CharField()
+    username = serializers.CharField(max_length=settings.USERNAME)
     confirmation_code = serializers.CharField()
