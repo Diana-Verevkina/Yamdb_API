@@ -149,6 +149,7 @@ class ReviewAbstract(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.text
@@ -159,12 +160,11 @@ class Review(ReviewAbstract):
 
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
-        related_name='reviews',
         blank=True, null=True,
         verbose_name='Произведение',
         max_length=settings.MAX_LEN
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         default=1,
         validators=[
@@ -174,6 +174,7 @@ class Review(ReviewAbstract):
     )
 
     class Meta(ReviewAbstract.Meta):
+        default_related_name = 'reviews'
         verbose_name = 'Ревью'
         constraints = [
             models.UniqueConstraint(
@@ -188,11 +189,11 @@ class Comment(ReviewAbstract):
 
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
-        verbose_name='Комментарий',
         related_name='comments',
         max_length=settings.MAX_LEN,
         blank=True, null=True)
 
     class Meta(ReviewAbstract.Meta):
+        default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
