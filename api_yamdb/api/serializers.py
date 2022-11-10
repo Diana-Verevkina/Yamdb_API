@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Category, Comment, Genre, Title, Review, User
 
@@ -30,7 +31,7 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
@@ -39,8 +40,6 @@ class TitlesSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'name', 'year', 'description',
                             'genre', 'category', 'rating')
 
-    def get_rating(self, instance):
-        return instance.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitleCUDSerializer(serializers.ModelSerializer):
@@ -73,7 +72,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
-    score = serializers.IntegerField()
+    score = serializers.IntegerField(
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ]
+    )
 
     def validate(self, data):
         request = self.context['request']
@@ -81,7 +85,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             if Review.objects.filter(
                 title=get_object_or_404(
                     Title,
-                    pk=self.context['view'].kwargs.get('title_pk')),
+                    pk=self.context['view'].kwargs.get('title_id')),
                     author=request.user
             ).exists():
                 raise ValidationError('Вы не можете добавить более'
