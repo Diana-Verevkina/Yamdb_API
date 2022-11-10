@@ -174,7 +174,7 @@ class Review(ReviewAbstract):
     )
 
     class Meta(ReviewAbstract.Meta):
-        default_related_name='reviews'
+        default_related_name = 'reviews'
         verbose_name = 'Ревью'
         constraints = [
             models.UniqueConstraint(
@@ -194,6 +194,6 @@ class Comment(ReviewAbstract):
         blank=True, null=True)
 
     class Meta(ReviewAbstract.Meta):
-        default_related_name='comments'
+        default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
