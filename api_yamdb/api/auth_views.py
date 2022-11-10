@@ -10,9 +10,9 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import User
-
 from .serializers import RegisterDataSerializer, TokenSerializer
+
+from reviews.models import User
 
 
 @api_view(['POST'])
@@ -23,8 +23,15 @@ def register(request):
 
     try:
         user, _ = User.objects.get_or_create(**serializer.data)
-    except IntegrityError as err:
-        raise ValidationError(str(err))
+    except IntegrityError:
+        is_email_exists: bool = User.objects.filter(
+            email=serializer.data.get('email')).exists()
+        msg_email_exists = 'Электронная почта уже занята!'
+        msg_username_exists = 'username уже занят!'
+        final_message = (msg_email_exists
+                         if is_email_exists
+                         else msg_username_exists)
+        raise ValidationError(final_message)
 
     confirmation_code = default_token_generator.make_token(user)
     send_mail(

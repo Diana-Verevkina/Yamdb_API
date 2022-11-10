@@ -1,10 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import (
+    MinValueValidator, MaxValueValidator, RegexValidator, MaxLengthValidator
+)
 from django.db.models import Index
 
 from .validators import get_year
+
+
+class UsernameField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.validators.append(RegexValidator(r'^[\w.@+-]+$'))
 
 
 class User(AbstractUser):
@@ -22,7 +30,7 @@ class User(AbstractUser):
         verbose_name='Адрес электронной почты',
         unique=True, max_length=settings.EMAIL
     )
-    username = models.CharField(
+    username = UsernameField(
         verbose_name='Имя пользователя',
         max_length=settings.USERNAME,
         null=True,
@@ -30,7 +38,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=settings.SLUG,
+        max_length=max(map(lambda obj: len(obj[0]), ROLES)),
         choices=ROLES,
         default=USER
     )
