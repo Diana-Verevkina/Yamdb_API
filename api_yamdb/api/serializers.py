@@ -1,14 +1,13 @@
-from django.db.models import Avg
 from django.utils import timezone
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from .validators import MixinValidatorUsername
 from reviews.models import Category, Comment, Genre, Title, Review, User
-from api.validators import MixinValidatorUsername
 
 
 class CategorySerializer(serializers.ModelSerializer):

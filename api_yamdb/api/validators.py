@@ -1,7 +1,6 @@
 import re
-from django.conf import settings
+
 from rest_framework.exceptions import ValidationError
-from rest_framework import serializers
 
 
 class MixinValidatorUsername:
@@ -12,4 +11,3 @@ class MixinValidatorUsername:
         if not re.match(r'^[\w.@+-]+$', value):
             raise ValidationError('Username содержит недопустимые символы')
         return value
-
