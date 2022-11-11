@@ -91,13 +91,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                                       'одного отзыва на произведение')
         return data
 
-    def validate_score(self, data):
-        if data > 10:
-            raise ValidationError('Оценка не может быть больше 10')
-        if data < 1:
-            raise ValidationError('Оценка не может быть меньше 1')
-        return data
-
     class Meta:
         model = Review
         fields = ('id', 'author', 'score', 'text', 'pub_date', 'title')
