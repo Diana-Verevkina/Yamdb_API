@@ -157,7 +157,7 @@ class ReviewAbstract(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('pub_date',)
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text
@@ -176,8 +176,8 @@ class Review(ReviewAbstract):
         verbose_name='Оценка',
         default=1,
         validators=[
-            MaxValueValidator(10),
-            MinValueValidator(1)
+            MaxValueValidator(10, 'Оценка не может быть больше 10'),
+            MinValueValidator(1, 'Оценка не может быть меньше 1')
         ]
     )
 
@@ -197,7 +197,6 @@ class Comment(ReviewAbstract):
 
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
-        related_name='comments',
         max_length=settings.MAX_LEN,
         blank=True, null=True)
 
