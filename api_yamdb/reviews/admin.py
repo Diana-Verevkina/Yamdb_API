@@ -18,12 +18,20 @@ class TitleInline(admin.TabularInline):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'year', 'description', 'category')
+
+    def view_genre(self, obj):
+        genres = (', '.join([str(genre) for genre in obj.genre.all()]))
+        return genres
+
+    view_genre.short_description = 'Genres'
+
+    list_display = ('name', 'year', 'view_genre', 'description', 'category')
     inlines = [
         TitleInline,
     ]
     search_fields = ('name',)
     raw_id_fields = ('genre',)
+    list_editable = ('category',)
 
 
 class ReviewAdmin(admin.ModelAdmin):

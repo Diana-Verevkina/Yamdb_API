@@ -30,7 +30,7 @@ class GenreViewSet(CategoryViewSet):
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(
-        rating=Avg('reviews__score')).order_by('id')
+        rating=Avg('reviews__score'))
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)

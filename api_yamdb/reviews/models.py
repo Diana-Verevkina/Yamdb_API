@@ -113,7 +113,7 @@ class Title(models.Model):
                             max_length=settings.MAX_LEN)
     year = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(get_year)],
-        verbose_name='Год произведения')
+        verbose_name='Год произведения', db_index=True)
     description = models.TextField(verbose_name='Описание', blank=True,
                                    null=True)
     genre = models.ManyToManyField(Genre, through='TitlesGenre',
@@ -129,7 +129,6 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
-        Index(fields=['year'])
 
     def __str__(self):
         return self.name
