@@ -11,12 +11,3 @@ class CategoryGenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
     pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'slug'
-
-
-class ListCreateDestroyViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
-    pass
