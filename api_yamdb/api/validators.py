@@ -8,6 +8,8 @@ class MixinValidatorUsername:
     def validate_username(self, value):
         if value.lower() == 'me':
             raise ValidationError('Username не должно быть "me"')
-        if not re.match(r'^[\w.@+-]+$', value):
-            raise ValidationError('Username содержит недопустимые символы')
+        if value == re.sub(r'^[\w.@+-]+$', r'', value):
+            raise ValidationError(
+                'Username содержит недопустимые символы {value}'
+            )
         return value
