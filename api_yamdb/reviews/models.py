@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
 from django.core.validators import (
-    MinValueValidator, MaxValueValidator, RegexValidator, MaxLengthValidator,
+    MinValueValidator, MaxValueValidator, RegexValidator
 )
 from django.db.models import Index
 
