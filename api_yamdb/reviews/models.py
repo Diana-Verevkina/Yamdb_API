@@ -4,7 +4,6 @@ from django.db import models
 from django.core.validators import (
     MinValueValidator, MaxValueValidator, RegexValidator
 )
-from django.db.models import Index
 
 from .validators import get_year
 
