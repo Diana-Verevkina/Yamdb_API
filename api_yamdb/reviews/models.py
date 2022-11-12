@@ -2,17 +2,21 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
 from django.core.validators import (
-    MinValueValidator, MaxValueValidator, RegexValidator, MaxLengthValidator
+    MinValueValidator, MaxValueValidator, RegexValidator, MaxLengthValidator,
 )
 from django.db.models import Index
 
 from .validators import get_year
 
+message = ('Username содержит недопустимые символы {value}')
+
 
 class UsernameField(models.CharField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.validators.append(RegexValidator(r'^[\w.@+-]+$'))
+        self.validators.append(
+            RegexValidator(r'^[\w.@+-]+$', message)
+        )
 
 
 class User(AbstractUser):
@@ -32,13 +36,14 @@ class User(AbstractUser):
     )
     username = UsernameField(
         verbose_name='Имя пользователя',
+        help_text='Только буквы, цифры, @, +, -, _',
         max_length=settings.USERNAME,
         null=True,
         unique=True
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=max(map(lambda obj: len(obj[0]), ROLES)),
+        max_length=max((len(role[1]) for role in ROLES)),
         choices=ROLES,
         default=USER
     )

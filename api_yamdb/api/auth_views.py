@@ -14,6 +14,9 @@ from .serializers import RegisterDataSerializer, TokenSerializer
 
 from reviews.models import User
 
+msg_email_exists = 'Электронная почта уже занята!'
+msg_username_exists = 'username уже занят!'
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -26,8 +29,6 @@ def register(request):
     except IntegrityError:
         is_email_exists: bool = User.objects.filter(
             email=serializer.data.get('email')).exists()
-        msg_email_exists = 'Электронная почта уже занята!'
-        msg_username_exists = 'username уже занят!'
         final_message = (msg_email_exists
                          if is_email_exists
                          else msg_username_exists)
