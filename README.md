@@ -1,6 +1,6 @@
 # REST API для проекта YaMDb
 
- <img src="img.png">
+ <img src="img.png" style="height: 100pt">
 
 Проект даёт возможность управлять данными методом API запросов.
 
